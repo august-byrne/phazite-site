@@ -1,0 +1,189 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+/* Phazite's look, taken from the app's design tokens (Phazite's src/ui/theme/DesignTokens.h): its dark and light palettes,
+   which are VS Code's 2026 Dark and Light under their MIT notice, Inter, 8 px corners and 1 px borders. The site is dark
+   until a visitor picks Light or Auto (the system's theme) in the theme switch, as the app opens dark
+   (src/components/ThemeProvider.astro). Starlight's own colours are set from the same tokens, so that its pages and
+   Phazite's own look alike. */
+
+:root {
+	--pz-background: #121314;
+	--pz-surface: #191a1b;
+	--pz-surface-raised: #202122;
+	--pz-border: #2a2b2c;
+	--pz-control-border: #333536;
+	--pz-text: #bfbfbf;
+	--pz-text-muted: #8c8c8c;
+	--pz-text-bright: #ededed;
+	--pz-accent: #297aa0;
+	--pz-accent-hover: #3388ae;
+	--pz-text-on-accent: #ffffff;
+	--pz-focus: #3994bc;
+	--pz-link: #8fc7e3;
+	--pz-warning: #e5ba7d;
+	/* The logo's cyan (#62c6ec), faint, behind the window's picture. */
+	--pz-glow: rgb(98 198 236 / 0.12);
+	--pz-radius: 8px;
+
+	--sl-font: 'Inter Variable';
+	--sl-color-white: var(--pz-text-bright);
+	--sl-color-gray-1: #d9d9d9;
+	--sl-color-gray-2: var(--pz-text);
+	--sl-color-gray-3: var(--pz-text-muted);
+	--sl-color-gray-4: #5c5c5c;
+	--sl-color-gray-5: var(--pz-border);
+	--sl-color-gray-6: var(--pz-surface);
+	--sl-color-black: var(--pz-background);
+	--sl-color-accent-low: #13303e;
+	--sl-color-accent: var(--pz-accent);
+	--sl-color-accent-high: var(--pz-link);
+}
+
+:root[data-theme='light'] {
+	--pz-background: #ffffff;
+	--pz-surface: #fafafd;
+	--pz-surface-raised: #f0f0f3;
+	--pz-border: #e4e5e6;
+	--pz-control-border: #d8d8d8;
+	--pz-text: #202020;
+	--pz-text-muted: #606060;
+	--pz-text-bright: #202020;
+	--pz-accent: #0069cc;
+	--pz-accent-hover: #005fb8;
+	--pz-text-on-accent: #ffffff;
+	--pz-focus: #0069cc;
+	--pz-link: #0069cc;
+	--pz-warning: #895503;
+	--pz-glow: rgb(60 109 149 / 0.14);
+
+	--sl-color-white: var(--pz-text-bright);
+	--sl-color-gray-1: #202020;
+	--sl-color-gray-2: var(--pz-text);
+	--sl-color-gray-3: var(--pz-text-muted);
+	--sl-color-gray-4: #767676;
+	--sl-color-gray-5: var(--pz-control-border);
+	--sl-color-gray-6: var(--pz-border);
+	--sl-color-gray-7: var(--pz-surface);
+	--sl-color-black: var(--pz-background);
+	--sl-color-accent-low: #dcebfa;
+	--sl-color-accent: var(--pz-accent);
+	--sl-color-accent-high: #004f99;
+}
+
+/* Inter's contextual alternates turn "x64" into "×64"; the site writes what it means. */
+:root {
+	font-feature-settings: 'calt' 0;
+}
+
+/* Starlight's blue (its notes) in the accent's hue, as the app's info is. */
+:root {
+	--sl-hue-blue: 199;
+	--sl-color-blue-low: hsl(var(--sl-hue-blue), 48%, 16%);
+	--sl-color-blue: hsl(var(--sl-hue-blue), 59%, 45%);
+	--sl-color-blue-high: hsl(var(--sl-hue-blue), 59%, 72%);
+}
+
+:root[data-theme='light'] {
+	--sl-color-blue-low: hsl(var(--sl-hue-blue), 70%, 94%);
+	--sl-color-blue: hsl(var(--sl-hue-blue), 80%, 40%);
+	--sl-color-blue-high: hsl(var(--sl-hue-blue), 90%, 24%);
+}
+
+/* The site's name in the header as the app writes its own, in bright text. */
+.site-title {
+	color: var(--pz-text-bright);
+}
+
+/* On a narrow screen, room in the header for the menu button on a page without a sidebar (src/components/Header.astro),
+   as Starlight leaves it on the others; and, in the menu, the site's sections once, in its sidebar. */
+@media (width < 50em) {
+	:root:not([data-has-sidebar]) header.header {
+		padding-inline-end: calc(var(--sl-nav-gap) + var(--sl-nav-pad-x) + var(--sl-menu-button-size));
+	}
+}
+
+.mobile-preferences .pz-sections {
+	display: none;
+}
+
+/* What is selected, as the app's lists show it: a wash of the accent behind bright text. */
+.sidebar-content a[aria-current='page'],
+.sidebar-content a[aria-current='page']:hover,
+.sidebar-content a[aria-current='page']:focus {
+	background-color: color-mix(in srgb, var(--pz-accent) 32%, transparent);
+	color: var(--pz-text-bright);
+}
+
+/* Buttons, as the app's: the main one in the accent, the others outlined. */
+.pz-button {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.625rem 1.125rem;
+	border: 1px solid var(--pz-control-border);
+	border-radius: var(--pz-radius);
+	background: var(--pz-surface-raised);
+	color: var(--pz-text-bright);
+	font-size: var(--sl-text-base);
+	font-weight: 600;
+	line-height: 1.25;
+	text-decoration: none;
+}
+
+.pz-button:hover {
+	border-color: var(--pz-text-muted);
+	color: var(--pz-text-bright);
+}
+
+.pz-button.primary {
+	border-color: transparent;
+	background: var(--pz-accent);
+	color: var(--pz-text-on-accent);
+}
+
+.pz-button.primary:hover {
+	background: var(--pz-accent-hover);
+	color: var(--pz-text-on-accent);
+}
+
+.pz-button:focus-visible {
+	outline: 2px solid var(--pz-focus);
+	outline-offset: 2px;
+}
+
+.pz-button svg {
+	width: 1.125rem;
+	height: 1.125rem;
+}
+
+/* A card, as the app's panels are. */
+.pz-card {
+	border: 1px solid var(--pz-border);
+	border-radius: var(--pz-radius);
+	background: var(--pz-surface);
+}
+
+.pz-icon {
+	display: inline-flex;
+}
+
+.pz-icon svg {
+	width: 100%;
+	height: 100%;
+}
+
+/* A word on its own pill: "Pre-alpha". */
+.pz-chip {
+	display: inline-block;
+	padding: 0.125rem 0.625rem;
+	border: 1px solid color-mix(in srgb, var(--pz-warning) 45%, transparent);
+	border-radius: 999px;
+	color: var(--pz-warning);
+	font-size: var(--sl-text-sm);
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.pz-chip:hover {
+	border-color: var(--pz-warning);
+	color: var(--pz-warning);
+}

@@ -1,0 +1,108 @@
+---
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// What this site is built with and sends to its visitors, each with its licence's text as its package ships it, so
+// that no notice is left out: a package without its licence's file stops the build.
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+
+const parts = [
+	{ name: 'Astro', url: 'https://astro.build', licence: 'MIT', file: 'node_modules/astro/LICENSE', use: 'Builds the site.' },
+	{
+		name: 'Starlight',
+		url: 'https://starlight.astro.build',
+		licence: 'MIT',
+		file: 'node_modules/@astrojs/starlight/LICENSE',
+		use: "The pages' layout, navigation and theme switch.",
+	},
+	{
+		name: 'Pagefind',
+		url: 'https://pagefind.app',
+		licence: 'MIT',
+		file: 'node_modules/pagefind/LICENSE/LICENSE',
+		use: 'Search, which runs in your browser.',
+	},
+	{
+		name: 'Expressive Code',
+		url: 'https://expressive-code.com',
+		licence: 'MIT',
+		file: 'node_modules/astro-expressive-code/LICENSE',
+		use: 'Code blocks and their copy button.',
+	},
+	{
+		name: 'Inter',
+		url: 'https://rsms.me/inter/',
+		licence: 'OFL-1.1',
+		file: 'node_modules/@fontsource-variable/inter/LICENSE',
+		use: 'The font, as in the app.',
+	},
+	{
+		name: 'Lucide',
+		url: 'https://lucide.dev',
+		licence: 'ISC AND MIT',
+		file: 'src/generated/lucide/LICENSE',
+		use: 'Icons, the same as the app’s.',
+	},
+].map((part) => ({ ...part, text: readFileSync(path.join(process.cwd(), part.file), 'utf8').trim() }));
+---
+
+<div class="parts">
+	{
+		parts.map((part) => (
+			<details class="pz-card">
+				<summary>
+					<a href={part.url}>{part.name}</a>
+					<span class="use">{part.use}</span>
+					<span class="licence">{part.licence}</span>
+				</summary>
+				<pre>{part.text}</pre>
+			</details>
+		))
+	}
+</div>
+
+<style>
+	.parts {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		margin-top: 1rem;
+	}
+
+	details {
+		margin: 0;
+		padding: 0.75rem 1rem;
+	}
+
+	summary {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 0.75rem;
+		align-items: baseline;
+		cursor: pointer;
+		font-weight: 600;
+	}
+
+	.use {
+		font-size: var(--sl-text-sm);
+		font-weight: 400;
+	}
+
+	.licence {
+		margin-inline-start: auto;
+		color: var(--pz-text-muted);
+		font-size: var(--sl-text-xs);
+		font-weight: 400;
+	}
+
+	pre {
+		max-height: 20rem;
+		margin: 0.75rem 0 0;
+		padding: 0.75rem;
+		overflow: auto;
+		border: 1px solid var(--pz-border);
+		border-radius: var(--pz-radius);
+		background: var(--pz-background);
+		font-size: var(--sl-text-xs);
+		white-space: pre-wrap;
+	}
+</style>

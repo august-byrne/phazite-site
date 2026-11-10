@@ -1,0 +1,58 @@
+---
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Starlight's footer (the guide's edit link and its previous and next pages), then the site's own on every page: its
+// links, the copyright, and the trademark sentences Steinberg's guidelines ask for, word for word.
+import Default from '@astrojs/starlight/components/Footer.astro';
+import { repository, withBase } from '../lib/site';
+---
+
+<Default />
+<div class="site-footer not-content">
+	<nav aria-label="Footer">
+		<a href={withBase('download/')}>Download</a>
+		<a href={withBase('guide/getting-started/')}>Guide</a>
+		<a href={withBase('guide/privacy/')}>Privacy</a>
+		<a href={withBase('about/')}>License and notices</a>
+		<a href={repository}>GitHub</a>
+	</nav>
+	<p>Copyright © 2026 the Phazite contributors. Phazite is free software under the AGPL-3.0-or-later.</p>
+	<p>
+		VST is a registered trademark of Steinberg Media Technologies GmbH. ASIO is a registered trademark of Steinberg
+		Media Technologies GmbH. Other names of products are their owners' trademarks, named only to say what Phazite works
+		with.
+	</p>
+</div>
+
+<style>
+	.site-footer {
+		margin-top: 4rem;
+		padding-top: 1.5rem;
+		border-top: 1px solid var(--pz-border);
+		color: var(--pz-text-muted);
+		font-size: var(--sl-text-xs);
+		line-height: 1.6;
+	}
+
+	nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.5rem;
+		margin-bottom: 1rem;
+		font-size: var(--sl-text-sm);
+	}
+
+	nav a {
+		color: var(--pz-text);
+		text-decoration: none;
+	}
+
+	nav a:hover {
+		color: var(--pz-text-bright);
+		text-decoration: underline;
+	}
+
+	p {
+		margin: 0.25rem 0 0;
+		max-width: 50rem;
+	}
+</style>

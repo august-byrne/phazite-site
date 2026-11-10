@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.astro/
+
+# Copied from the Phazite repository by scripts/sync.mjs before each build, so that it stays the one source of them.
+src/content/docs/guide/
+src/generated/
+public/favicon.svg
+public/social-preview.png

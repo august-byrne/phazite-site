@@ -1,0 +1,22 @@
+---
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// The page for an address the site doesn't have, in place of Starlight's (whose hero would be the home page's).
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { withBase } from '../lib/site';
+---
+
+<StarlightPage
+	frontmatter={{
+		title: 'Page not found',
+		description: 'There is no page at this address.',
+		editUrl: false,
+		pagefind: false,
+	}}
+>
+	<p>
+		There is no page at this address: it may have moved. <a href={withBase('')}>The home page</a>, the <a
+			href={withBase('download/')}>Download page</a
+		> and <a href={withBase('guide/getting-started/')}>Getting started</a> are the places to begin, and the search at the
+		top finds the rest.
+	</p>
+</StarlightPage>

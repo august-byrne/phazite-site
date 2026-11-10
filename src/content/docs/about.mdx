@@ -1,0 +1,42 @@
+---
+title: About Phazite
+description: Who makes Phazite and why, its license, and the code and fonts it and this site are built with.
+editUrl: https://github.com/august-byrne/phazite-site/edit/main/src/content/docs/about.mdx
+---
+
+import Notices from '../../components/Notices.astro';
+import SiteNotices from '../../components/SiteNotices.astro';
+
+Phazite is a free, open-source digital audio workstation for making beats and finishing songs, built in the open by the Phazite contributors. It is written in C++20 on [JUCE](https://juce.com), with a playback engine of its own, for Windows first and then Linux and macOS.
+
+## What it aims for
+
+- **One track, one channel.** Every track is a row in the playlist, a chain of devices and a mixer channel, made together with one name and one color. There is no channel rack.
+- **One window, with no beginner or pro mode.** Depth shows where you are: in the inspector, the menus and the command search.
+- **Every action is a command,** with a name, a sentence that says what it does, and keys you can change.
+- **Help where you are:** the bar along the bottom says what the mouse and the keys will do under the pointer.
+- **Nothing hidden:** routing, linked clips, automation and modulation show where they act.
+- **Stable and fast:** Auto Save, recovery after a crash, plug-ins in processes of their own, and strict real-time rules in its audio engine.
+- **Local and private:** no account, and your projects stay on your computer.
+
+[The design](https://github.com/august-byrne/Phazite/blob/main/docs/design.md) explains each choice and the research behind it, [the roadmap](https://github.com/august-byrne/Phazite/blob/main/docs/roadmap.md) has the plan step by step, and [the project board](https://github.com/users/august-byrne/projects/1) shows what comes next, by month.
+
+## License
+
+Phazite is licensed under the [GNU Affero General Public License, version 3 or later](https://github.com/august-byrne/Phazite/blob/main/LICENSE). You may use it for anything, music you sell included, and share and change it, as long as what you share stays under the same license, with its source code. It comes with no warranty.
+
+Copyright © 2026 the Phazite contributors.
+
+## What Phazite is built with
+
+Each comes with its license's text in the `licenses` folder next to Phazite, and **Help > About Phazite** shows them all.
+
+<Notices />
+
+## What this site is built with
+
+<SiteNotices />
+
+## Trademarks
+
+VST is a registered trademark of Steinberg Media Technologies GmbH. ASIO is a registered trademark of Steinberg Media Technologies GmbH. Visual Studio Code is a trademark of Microsoft Corporation: Phazite's look takes its themes' colors and layout, under their MIT license, and Phazite isn't affiliated with or endorsed by Microsoft. Other names of products are their owners' trademarks, named only to say what Phazite works with or what a sound is like.

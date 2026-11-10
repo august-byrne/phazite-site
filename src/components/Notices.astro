@@ -1,0 +1,86 @@
+---
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// What Phazite is built with, from the list the app's About box shows (Phazite's resources/licenses/notices.json).
+import notices from '../generated/notices.json';
+
+interface Notice {
+	name: string;
+	version: string;
+	licence: string;
+	copyright: string;
+	use: string;
+	url: string;
+	platforms?: string[];
+}
+
+const platformNames: Record<string, string> = { windows: 'Windows', linux: 'Linux', macos: 'macOS' };
+---
+
+<div class="notices">
+	{
+		(notices.notices as Notice[]).map((notice) => (
+			<section class="pz-card">
+				<p class="title">
+					<a href={notice.url}>{notice.name}</a>
+					{notice.version && <span class="version">{notice.version}</span>}
+					<span class="licence">{notice.licence}</span>
+				</p>
+				<p class="use">
+					{notice.use}
+					{notice.platforms && ` (in Phazite for ${notice.platforms.map((p) => platformNames[p] ?? p).join(' and ')})`}
+				</p>
+				<p class="copyright">{notice.copyright}</p>
+			</section>
+		))
+	}
+</div>
+
+<style>
+	.notices {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+		gap: 0.75rem;
+		margin-top: 1rem;
+	}
+
+	section {
+		margin: 0;
+		padding: 0.875rem 1rem;
+	}
+
+	p {
+		margin: 0;
+	}
+
+	.title {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 0.5rem;
+		align-items: baseline;
+		font-weight: 600;
+	}
+
+	.version,
+	.licence {
+		color: var(--pz-text-muted);
+		font-size: var(--sl-text-xs);
+		font-weight: 400;
+	}
+
+	.licence {
+		margin-inline-start: auto;
+	}
+
+	.use {
+		margin-top: 0.375rem;
+		font-size: var(--sl-text-sm);
+		line-height: 1.5;
+	}
+
+	.copyright {
+		margin-top: 0.375rem;
+		color: var(--pz-text-muted);
+		font-size: var(--sl-text-xs);
+		line-height: 1.5;
+	}
+</style>

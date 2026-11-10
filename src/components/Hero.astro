@@ -1,0 +1,131 @@
+---
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// The home page's top, in place of Starlight's hero: the logo, the name and what Phazite is, the way to get it, and the
+// window's picture under them, as wide as the page.
+import { Picture } from 'astro:assets';
+import logo from '../generated/logo.svg?raw';
+import screenshot from '../generated/phazite.png';
+import { getRelease, repository, withBase } from '../lib/site';
+import LucideIcon from './LucideIcon.astro';
+
+const { hero } = Astro.locals.starlightRoute.entry.data;
+const release = getRelease();
+---
+
+<div class="hero not-content">
+	<div class="intro">
+		<span class="mark" aria-hidden="true" set:html={logo} />
+		<h1 id="_top">{hero?.title}</h1>
+		<p class="tagline">{hero?.tagline}</p>
+		<p class="summary">
+			Uncluttered and quick, light on your computer, with instruments and effects of its own, your plug-ins, and versions
+			of every song.
+		</p>
+		<div class="actions">
+			<a class="pz-button primary" href={withBase('download/')}>
+				<LucideIcon name="download" />
+				{release ? 'Download for Windows' : 'Get Phazite'}
+			</a>
+			<a class="pz-button" href={repository}>View the code on GitHub</a>
+		</div>
+		<p class="status">
+			<a class="pz-chip" href={withBase('guide/faq/#what-does-pre-alpha-mean')}>Pre-alpha</a>
+			<span>
+				{release ? `Version ${release.version} for Windows 11 x64` : 'Windows 11 x64 · no release yet: build it yourself'}
+			</span>
+		</p>
+	</div>
+	<Picture
+		class="shot"
+		src={screenshot}
+		formats={['avif', 'webp']}
+		fallbackFormat="webp"
+		widths={[720, 1080, 1440, 2160]}
+		sizes="(min-width: 72rem) 67.5rem, calc(100vw - 2rem)"
+		alt="Phazite with the House Groove example song: the browser on the left with Phazite's instruments, the whole song in the playlist with its sections, chord lane, a filter's automation and the playhead in the second drop, and the synth of the Chords track under it"
+		loading="eager"
+		fetchpriority="high"
+	/>
+</div>
+
+<style>
+	.hero {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 2.5rem;
+		padding-block: 2rem 1rem;
+		text-align: center;
+	}
+
+	.intro {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		max-width: 40rem;
+	}
+
+	.mark {
+		display: block;
+		width: 4rem;
+		height: 4rem;
+		margin-bottom: 1rem;
+	}
+
+	.mark :global(svg) {
+		width: 100%;
+		height: 100%;
+	}
+
+	h1 {
+		margin: 0;
+		color: var(--pz-text-bright);
+		font-size: clamp(2.5rem, 6vw, 3.5rem);
+		font-weight: 700;
+		letter-spacing: -0.02em;
+		line-height: 1.1;
+	}
+
+	.tagline {
+		margin: 0.75rem 0 0;
+		color: var(--pz-text-bright);
+		font-size: clamp(1.25rem, 3vw, 1.5rem);
+		font-weight: 500;
+		line-height: 1.35;
+	}
+
+	.summary {
+		margin: 0.75rem 0 0;
+		color: var(--pz-text-muted);
+		font-size: var(--sl-text-lg);
+		line-height: 1.6;
+	}
+
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 0.75rem;
+		margin-top: 1.75rem;
+	}
+
+	.status {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		align-items: center;
+		gap: 0.5rem 0.75rem;
+		margin: 1.25rem 0 0;
+		color: var(--pz-text-muted);
+		font-size: var(--sl-text-sm);
+	}
+
+	.hero :global(.shot) {
+		display: block;
+		width: 100%;
+		height: auto;
+		border: 1px solid var(--pz-border);
+		border-radius: var(--pz-radius);
+		box-shadow: 0 1.5rem 5rem var(--pz-glow);
+	}
+</style>

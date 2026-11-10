@@ -1,0 +1,210 @@
+---
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// The home page: what Phazite is and how to get it (the hero, src/components/Hero.astro), what it does, who it suits,
+// what it promises, and how to take part.
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import LucideIcon from '../components/LucideIcon.astro';
+import { repository, withBase } from '../lib/site';
+
+const features = [
+	{
+		icon: 'layout-dashboard',
+		title: 'Arrange',
+		text: 'A playlist of tracks, folders and clips, with song sections, a chord lane of 40 progressions, a tempo lane that holds, jumps or ramps, and automation on any knob.',
+	},
+	{
+		icon: 'piano',
+		title: 'Write',
+		text: 'A piano roll with a drum mode, keys and scales, chord stamps and transforms, and audio clips that follow the tempo, change pitch or play backwards.',
+	},
+	{
+		icon: 'keyboard-music',
+		title: 'Sound',
+		text: 'Instruments of its own (Synth, Wavetable, Drum Sampler, Sampler and FM) and thirteen effects, each with presets, beside your VST®3 plug-ins.',
+	},
+	{
+		icon: 'zap',
+		title: 'Plug-ins that crash alone',
+		text: 'Each plug-in plays in a process of its own. One that crashes or hangs says so in its slot, with Reload, and the song plays on.',
+	},
+	{
+		icon: 'git-branch',
+		title: 'Versions of every song',
+		text: 'Commit the song with a message, see what changed track by track, branch to try an idea and merge it back, or hear an earlier commit in place.',
+	},
+	{
+		icon: 'audio-lines',
+		title: 'Record, mix, finish',
+		text: 'Record MIDI and audio with count-in and punch-in, mix with buses, sends, sidechains and parallel chains, and export the song or its stems.',
+	},
+];
+
+const promises = [
+	{
+		title: 'Free and open',
+		text: 'Free to use for anything, under the AGPL-3.0-or-later, with every line of its code on GitHub.',
+	},
+	{ title: 'No account', text: 'Nothing to sign up for, and your projects stay on your computer.' },
+	{
+		title: 'Online only when you ask',
+		text: 'It downloads Phazite Sounds or checks for a newer version only when you say so, and sends nothing about you.',
+	},
+];
+---
+
+<StarlightPage
+	frontmatter={{
+		title: 'A free, open-source DAW',
+		description:
+			'Phazite is a free, open-source DAW for making beats and finishing songs, for Windows: uncluttered and quick, with its own instruments and effects, your VST3 plug-ins, and versions of every song.',
+		template: 'splash',
+		hero: { title: 'Phazite', tagline: 'A free, open-source DAW for making beats and finishing songs.' },
+		editUrl: false,
+	}}
+>
+	<div class="home not-content">
+		<section aria-labelledby="what">
+			<h2 id="what" class="visually-hidden">What it does</h2>
+			<ul class="features">
+				{
+					features.map((feature) => (
+						<li class="pz-card">
+							<LucideIcon name={feature.icon} class="feature-icon" />
+							<h3>{feature.title}</h3>
+							<p>{feature.text}</p>
+						</li>
+					))
+				}
+			</ul>
+		</section>
+
+		<section class="band pz-card" aria-labelledby="coming-from">
+			<div>
+				<h2 id="coming-from">Coming from FL Studio or Ableton Live?</h2>
+				<p>
+					Phazite keeps the playlist, the piano roll and the mixer, with each track one row, one chain of devices and one
+					mixer channel. Choose their shortcuts as Phazite first opens. DAWproject, the open format Bitwig Studio, Studio
+					One and Cubase share, takes your songs out with your plug-ins' settings, and brings them in.
+				</p>
+			</div>
+			<a class="pz-button" href={withBase('guide/getting-started/')}>Getting started</a>
+		</section>
+
+		<section aria-labelledby="promises">
+			<h2 id="promises">Yours, and private</h2>
+			<ul class="promises">
+				{
+					promises.map((promise) => (
+						<li>
+							<h3>{promise.title}</h3>
+							<p>{promise.text}</p>
+						</li>
+					))
+				}
+			</ul>
+		</section>
+
+		<section class="band pz-card" aria-labelledby="involved">
+			<div>
+				<h2 id="involved">Built in the open</h2>
+				<p>
+					Phazite is pre-alpha, and every kind of help counts: try it and <a href={`${repository}/issues`}>say what
+					tripped you up</a>, <a href={`${repository}/blob/main/CONTRIBUTING.md`}>help write it</a>, or see where it is
+					going on <a href="https://github.com/users/august-byrne/projects/1">the project board</a>.
+				</p>
+			</div>
+			<a class="pz-button" href={repository}>Phazite on GitHub</a>
+		</section>
+	</div>
+</StarlightPage>
+
+<style>
+	.home {
+		display: flex;
+		flex-direction: column;
+		gap: 3rem;
+		margin-top: 3rem;
+	}
+
+	.visually-hidden {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+
+	ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	h2 {
+		margin: 0;
+		color: var(--pz-text-bright);
+		font-size: var(--sl-text-2xl);
+		font-weight: 600;
+		line-height: 1.3;
+	}
+
+	h3 {
+		margin: 0;
+		color: var(--pz-text-bright);
+		font-size: var(--sl-text-lg);
+		font-weight: 600;
+		line-height: 1.3;
+	}
+
+	p {
+		margin: 0.5rem 0 0;
+		line-height: 1.6;
+	}
+
+	a:not(.pz-button) {
+		color: var(--sl-color-text-accent);
+	}
+
+	.features {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+		gap: 1rem;
+	}
+
+	.features li {
+		padding: 1.25rem;
+	}
+
+	.features :global(.feature-icon) {
+		width: 1.75rem;
+		height: 1.75rem;
+		margin-bottom: 0.75rem;
+		color: var(--pz-focus);
+	}
+
+	.band {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.25rem 2rem;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1.5rem;
+	}
+
+	.band > div {
+		flex: 1 1 28rem;
+	}
+
+	.promises {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+		gap: 1rem 2rem;
+		margin-top: 1rem;
+	}
+
+	.promises li {
+		padding-inline-start: 1rem;
+		border-inline-start: 2px solid var(--pz-accent);
+	}
+</style>

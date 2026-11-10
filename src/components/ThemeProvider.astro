@@ -1,0 +1,38 @@
+---
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Starlight's theme provider (MIT), changed so that the site is dark until a visitor picks a theme, as Phazite opens
+// dark (the owner, 2026-11-09). Auto, the system's theme, is a choice of its own, kept as "auto"; nothing is kept until
+// the visitor picks (ThemeSelect.astro). Inlined, so that the page never shows another theme first.
+import { Icon } from '@astrojs/starlight/components';
+---
+
+<script is:inline>
+	window.StarlightThemeProvider = (() => {
+		let stored = null;
+		try {
+			stored = localStorage.getItem('starlight-theme');
+		} catch {}
+		const choice = stored === 'light' || stored === 'auto' ? stored : 'dark';
+		const fromSystem = () => (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+		document.documentElement.dataset.theme = choice === 'auto' ? fromSystem() : choice;
+		return {
+			updatePickers(theme = choice) {
+				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
+					const select = picker.querySelector('select');
+					if (select) select.value = theme;
+					/** @type {HTMLTemplateElement | null} */
+					const icons = document.querySelector('#theme-icons');
+					const newIcon = icons && icons.content.querySelector('.' + theme);
+					const oldIcon = picker.querySelector('svg.label-icon');
+					if (newIcon && oldIcon) oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
+				});
+			},
+		};
+	})();
+</script>
+
+<template id="theme-icons">
+	<Icon name="sun" class="light" />
+	<Icon name="moon" class="dark" />
+	<Icon name="laptop" class="auto" />
+</template>

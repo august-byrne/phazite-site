@@ -1,0 +1,16 @@
+---
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// One of the Lucide icons the app uses (Phazite's resources/icons/lucide, ISC), drawn in the text's colour.
+const icons = import.meta.glob<string>('../generated/lucide/*.svg', { query: '?raw', import: 'default', eager: true });
+
+interface Props {
+	name: string;
+	class?: string;
+}
+
+const { name, class: className } = Astro.props;
+const svg = icons[`../generated/lucide/${name}.svg`];
+if (!svg) throw new Error(`The app has no Lucide icon named "${name}" (resources/icons/lucide).`);
+---
+
+<span class:list={['pz-icon', className]} aria-hidden="true" set:html={svg} />

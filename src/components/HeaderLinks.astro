@@ -1,0 +1,52 @@
+---
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// The site's sections, in the header beside the GitHub link (in place of Starlight's social icons alone). On a narrow
+// screen the menu shows them in its sidebar, so they hide in its footer (theme.css), where the GitHub link stays.
+import Default from '@astrojs/starlight/components/SocialIcons.astro';
+import { withBase } from '../lib/site';
+
+const links = [
+	{ label: 'Download', href: withBase('download/'), section: withBase('download/') },
+	{ label: 'Guide', href: withBase('guide/getting-started/'), section: withBase('guide/') },
+	{ label: 'About', href: withBase('about/'), section: withBase('about/') },
+];
+const here = Astro.url.pathname;
+---
+
+<nav class="sections pz-sections" aria-label="Site">
+	{
+		links.map((link) => (
+			<a href={link.href} aria-current={here.startsWith(link.section) ? 'page' : undefined}>
+				{link.label}
+			</a>
+		))
+	}
+</nav>
+<Default />
+
+<style>
+	.sections {
+		display: flex;
+		gap: 1.25rem;
+		align-items: center;
+	}
+
+	.sections a {
+		color: var(--pz-text);
+		font-size: var(--sl-text-sm);
+		font-weight: 500;
+		text-decoration: none;
+	}
+
+	.sections a:hover,
+	.sections a[aria-current='page'] {
+		color: var(--pz-text-bright);
+	}
+
+	.sections a[aria-current='page'] {
+		text-decoration: underline;
+		text-decoration-color: var(--pz-accent);
+		text-decoration-thickness: 2px;
+		text-underline-offset: 0.5rem;
+	}
+</style>

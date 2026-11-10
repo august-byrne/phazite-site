@@ -1,0 +1,79 @@
+# Builds Phazite's website and publishes it on GitHub Pages: on every push to main, every day (for the guide's changes
+# in the Phazite repository and for a new release), and by hand (Actions > Deploy > Run workflow).
+# The guide comes from the latest release's tag, so that it says what the installer does, or from Phazite's main
+# branch while there is no release. Actions are pinned to full commit hashes, as in the Phazite repository.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '23 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Find the latest release
+        id: release
+        run: |
+          if curl --fail --silent --show-error --location --output release.json \
+              https://github.com/august-byrne/Phazite/releases/latest/download/phazite-update.json; then
+            echo "ref=v$(jq --raw-output .version release.json)" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=main" >> "$GITHUB_OUTPUT"
+          fi
+          rm -f release.json
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: august-byrne/Phazite
+          ref: ${{ steps.release.outputs.ref }}
+          path: phazite
+          persist-credentials: false
+          sparse-checkout: |
+            docs/guide
+            docs/images
+            resources/icons/lucide
+            resources/licenses
+            resources/logo
+          sparse-checkout-cone-mode: true
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+
+      - run: npm ci
+
+      - run: npm run build
+        env:
+          PHAZITE_DIR: phazite
+
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

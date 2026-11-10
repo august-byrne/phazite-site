@@ -1,0 +1,145 @@
+---
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// The Download page: the latest release's installer, as its update file names it (scripts/sync.mjs), with its size and
+// SHA-256 and the line that checks it; or, while there is no release, how to build Phazite. Then the other systems,
+// Phazite Sounds and the source.
+import { Aside, Code } from '@astrojs/starlight/components';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import LucideIcon from '../components/LucideIcon.astro';
+import { formatSize, getRelease, repository, withBase } from '../lib/site';
+
+const release = getRelease();
+const check = release ? `(Get-FileHash .\\${release.fileName}).Hash -eq '${release.sha256}'` : '';
+---
+
+<StarlightPage
+	frontmatter={{
+		title: 'Download',
+		description: release
+			? `Phazite ${release.version} for Windows: the installer, its SHA-256, and what's next for Linux and macOS.`
+			: "Phazite has no release yet: how to build it yourself on Windows, and what's next for Linux and macOS.",
+		editUrl: `https://github.com/august-byrne/phazite-site/edit/main/src/pages/download.astro`,
+		tableOfContents: false,
+	}}
+>
+	{
+		release ? (
+			<>
+				<div class="get pz-card not-content">
+					<div>
+						<p class="name">Phazite {release.version} for Windows</p>
+						<p class="details">Windows 11 x64 · {formatSize(release.size)} · installs for you, without admin rights</p>
+					</div>
+					<a class="pz-button primary" href={release.installer}>
+						<LucideIcon name="download" />
+						Download the installer
+					</a>
+				</div>
+				<Aside type="caution" title="Pre-alpha">
+					Phazite changes from one build to the next, and projects saved now may not open in later builds. Export what
+					you want to keep as audio.
+				</Aside>
+				<p>
+					<a href={release.notes}>What's new in {release.version}</a> · <a href={`${repository}/releases`}>All releases</a>
+				</p>
+
+				<h2>Check the download</h2>
+				<p>
+					In PowerShell, in the folder you downloaded it to, this prints <code>True</code> when the installer is the one
+					the release was built with:
+				</p>
+				<Code code={check} lang="powershell" />
+
+				<h2>Install and update</h2>
+				<ul>
+					<li>
+						The installer puts Phazite in your user folder without asking for admin rights. Run it with{' '}
+						<code>/ALLUSERS</code> to install for every user of the PC instead.
+					</li>
+					<li>
+						<strong>Help > Check for Updates...</strong> finds a newer version, and installs it when you say so. To check
+						each time Phazite opens, turn on <strong>Check for Updates When Phazite Opens</strong>.
+					</li>
+					<li>
+						Windows' <strong>Installed apps</strong> removes Phazite and leaves your projects, presets, sounds and
+						settings.
+					</li>
+				</ul>
+			</>
+		) : (
+			<>
+				<p>
+					Phazite is pre-alpha and has no release yet. Until the first one, you build it yourself, on Windows 11 x64 with
+					about 15 GB free: the README's <a href={`${repository}#try-it`}>Try it</a> has the steps, and{' '}
+					<a href={`${repository}/blob/main/docs/building.md`}>Building Phazite</a> explains each one, with fixes for
+					when something goes wrong. The build takes a few minutes once its tools are set up.
+				</p>
+				<div class="get pz-card not-content">
+					<div>
+						<p class="name">Phazite on Windows 11 x64</p>
+						<p class="details">Pre-alpha · built from its source code</p>
+					</div>
+					<a class="pz-button primary" href={`${repository}#try-it`}>
+						How to build it
+					</a>
+				</div>
+				<Aside title="Hear when it's out">
+					On GitHub, <strong>Watch</strong> Phazite's repository and choose <strong>Custom</strong> and{' '}
+					<strong>Releases</strong> to hear when the first installer is out.
+				</Aside>
+			</>
+		)
+	}
+
+	<h2>Other systems</h2>
+	<ul>
+		<li>
+			<strong>Linux</strong> builds and passes its tests, and a beta comes with the first releases. Until then, <a
+				href={`${repository}/blob/main/docs/building.md`}>build it from its source code</a>.
+		</li>
+		<li><strong>macOS</strong> comes after version 1, with Audio Units.</li>
+	</ul>
+
+	<h2>Phazite Sounds</h2>
+	<p>
+		85 drums, loops and effects, free and in the public domain (CC0). The Welcome window downloads them when you ask, and
+		so does <strong>Help > Phazite Sounds</strong>. They are made in <a href="https://github.com/august-byrne/phazite-sounds"
+			>their own repository</a
+		>.
+	</p>
+
+	<h2>Source code</h2>
+	<p>
+		Phazite's code is on <a href={repository}>GitHub</a>, under the GNU Affero General Public License, version 3 or later.
+		Each release's code is its tag there. <a href={withBase('guide/getting-started/')}>Getting started</a> shows what to do
+		first.
+	</p>
+</StarlightPage>
+
+<style>
+	.get {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem 2rem;
+		align-items: center;
+		justify-content: space-between;
+		margin-block: 1.5rem;
+		padding: 1.25rem 1.5rem;
+	}
+
+	.get p {
+		margin: 0;
+	}
+
+	.name {
+		color: var(--pz-text-bright);
+		font-size: var(--sl-text-xl);
+		font-weight: 600;
+	}
+
+	.details {
+		margin-top: 0.25rem !important;
+		color: var(--pz-text-muted);
+		font-size: var(--sl-text-sm);
+	}
+</style>
