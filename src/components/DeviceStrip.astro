@@ -1,0 +1,248 @@
+---
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// The home page's chapter about Phazite's own devices: each one's editor as the app shows it
+// (src/pictures/device-<name>.png, and -light.png in its light theme), the instruments in one row and the effects in
+// another, which slide past as the page scrolls through the chapter (src/scripts/home.ts). Without scripts, or for a
+// visitor who asked for less motion, each row scrolls sideways by hand.
+import type { ImageMetadata } from 'astro';
+import { Picture } from 'astro:assets';
+import { withBase } from '../lib/site';
+
+const pictures = import.meta.glob<ImageMetadata>('../pictures/device-*.png', { eager: true, import: 'default' });
+
+const rows = [
+	{
+		kind: 'Instruments',
+		devices: [
+			['Synth', 'Two oscillators, a sub and a resonant filter, for basses, leads, pads and plucks.'],
+			['Wavetable', 'Two oscillators that morph through tables of waves, with warps and eight modulation slots.'],
+			['FM', 'Four operators for electric pianos, bells, basses and brass.'],
+			['Sampler', 'One sound across the keys: looped, played through, or cut into slices.'],
+			['Drum Sampler', 'A pad on every note, each with up to four layers and its own envelope and filter.'],
+		],
+	},
+	{
+		kind: 'Effects',
+		devices: [
+			['EQ', 'Eight bands, with a cut at each end.'],
+			['Compressor', 'Draw the curve yourself, or duck the sound under another track.'],
+			['Reverb', 'A room, a hall or a plate.'],
+			['Delay', 'Echoes in time with the song that darken like tape.'],
+			['Filter', 'A resonant filter with drive, combs and a vowel.'],
+			['Multiband', 'Dynamics in three bands, with a master band after them.'],
+			['Limiter', 'Look-ahead limiting to a true-peak ceiling, for the master.'],
+			['Saturator', 'Harmonics that make a sound warmer, fuller or grittier.'],
+			['Exciter', 'The presence and air an EQ cannot add.'],
+			['Chorus', 'From a two-voice chorus to a string machine.'],
+			['Phaser', 'The moving notches of a four-stage pedal.'],
+			['Flanger', 'The whoosh of tape flanging.'],
+			['Vinyl', 'The wow, crackle and hiss of a record.'],
+			['Vocoder', 'Makes a synth, or another track, speak with a voice.'],
+			['Stereo Expander', 'Wider or narrower, and the same in mono.'],
+		],
+	},
+].map((row) => ({
+	...row,
+	devices: row.devices.map(([name, text]) => {
+		const file = `../pictures/device-${name.toLowerCase().replaceAll(' ', '-')}`;
+		const faces = [
+			{ theme: 'dark', src: pictures[`${file}.png`] },
+			{ theme: 'light', src: pictures[`${file}-light.png`] },
+		];
+		if (faces.some((face) => !face.src))
+			throw new Error(`There is no picture of ${name} in each theme (src/pictures; README.md says how they are painted).`);
+		return { name, text, faces };
+	}),
+}));
+
+const instruments = rows[0].devices.length;
+const effects = rows[1].devices.length;
+// The heading counts them, so that it stays true when Phazite gets another.
+const words = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen',
+	'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
+const count = (n: number) => words[n] ?? String(n);
+const capital = (text: string) => text[0].toUpperCase() + text.slice(1);
+---
+
+<section class="strip" id="devices" aria-labelledby="devices-title" data-strip>
+	<div class="stage">
+		<header class="head">
+			<p class="name">Instruments and effects</p>
+			<h2 id="devices-title">
+				{capital(count(instruments))} instruments and {count(effects)} effects come with it.
+			</h2>
+			<p class="lede">
+				Each has presets to start from, and every knob can be automated or modulated. Your VST®3 plug-ins load beside
+				them.
+			</p>
+		</header>
+		{
+			rows.map((row) => (
+				<div class="lane" role="group" aria-label={row.kind}>
+					<ul class="row" data-row>
+						{row.devices.map((device) => (
+							<li class="device">
+								{device.faces.map((face) => (
+									<Picture
+										class={`editor pz-${face.theme}`}
+										src={face.src}
+										formats={['avif', 'webp']}
+										fallbackFormat="webp"
+										widths={[552, face.src.width]}
+										sizes="(min-width: 50em) 26rem, 80vw"
+										alt={`The ${device.name}'s editor in Phazite`}
+										loading="lazy"
+										decoding="async"
+									/>
+								))}
+								<h3>{device.name}</h3>
+								<p>{device.text}</p>
+							</li>
+						))}
+					</ul>
+				</div>
+			))
+		}
+		<a class="guide" href={withBase('guide/mixer/#the-devices-view')}>Devices in the guide</a>
+	</div>
+</section>
+
+<style>
+	.strip {
+		position: relative;
+		margin-top: 6rem;
+	}
+
+	/* The window's whole width, so that the rows run from edge to edge. */
+	.stage {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		justify-items: center;
+		gap: 1.5rem;
+		width: 100vw;
+		margin-inline: calc(50% - 50vw);
+		overflow: clip;
+	}
+
+	.head {
+		max-width: 46rem;
+		padding-inline: 1rem;
+		text-align: center;
+	}
+
+	.name {
+		margin: 0;
+		color: var(--sl-color-text-accent);
+		font-size: var(--sl-text-sm);
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	h2 {
+		margin: 0.5rem 0 0;
+		color: var(--pz-text-bright);
+		font-size: clamp(1.75rem, 4.4vw, 3rem);
+		font-weight: 700;
+		letter-spacing: -0.025em;
+		line-height: 1.1;
+		text-wrap: balance;
+	}
+
+	.lede {
+		margin: 0.875rem 0 0;
+		color: var(--pz-text);
+		font-size: var(--sl-text-lg);
+		line-height: 1.55;
+		text-wrap: pretty;
+	}
+
+	.lane {
+		width: 100%;
+		overflow-x: auto;
+		scrollbar-width: thin;
+	}
+
+	.row {
+		display: flex;
+		gap: 1rem;
+		width: max-content;
+		margin: 0;
+		padding: 0 max(1rem, 50vw - 42rem);
+		list-style: none;
+		will-change: transform;
+	}
+
+	/* A card is as wide as its picture is in the app; the script makes it narrower where the window is short (--card). */
+	.device {
+		width: var(--card, min(80vw, 26rem));
+		padding: 0.75rem 0.75rem 1rem;
+		border: 1px solid var(--pz-border);
+		border-radius: 0.75rem;
+		background: var(--pz-surface);
+	}
+
+	.device :global(.editor) {
+		display: block;
+		width: 100%;
+		height: auto;
+		border-radius: 0.375rem;
+		background: var(--pz-surface); /* the app's panel, under its picture */
+	}
+
+	.device h3 {
+		margin: 0.75rem 0 0;
+		color: var(--pz-text-bright);
+		font-size: var(--sl-text-base);
+		font-weight: 600;
+		line-height: 1.3;
+	}
+
+	.device p {
+		margin: 0.25rem 0 0;
+		color: var(--pz-text-muted);
+		font-size: var(--sl-text-sm);
+		line-height: 1.5;
+	}
+
+	.guide {
+		color: var(--sl-color-text-accent);
+		font-size: var(--sl-text-sm);
+		font-weight: 600;
+		text-decoration: none;
+	}
+
+	.guide::after {
+		content: ' \2192';
+	}
+
+	.guide:hover {
+		text-decoration: underline;
+	}
+
+	/* With the script, and motion welcome: the chapter is three screens tall, its stage stays in view, and the page's
+	   scroll slides the rows. */
+	:global(.pz-motion) .strip {
+		height: 340vh;
+		margin-top: 0;
+	}
+
+	:global(.pz-motion) .stage {
+		position: sticky;
+		top: var(--sl-nav-height);
+		height: calc(100vh - var(--sl-nav-height));
+		height: calc(100svh - var(--sl-nav-height));
+		align-content: center;
+		padding-block: 1rem;
+	}
+
+	:global(.pz-motion) .lane {
+		overflow: visible;
+	}
+
+	/* On a window too short for both rows under the heading, even with narrow cards: the names alone. */
+	.strip.pz-short .device p,
+	.strip.pz-short .lede {
+		display: none;
+	}
+</style>

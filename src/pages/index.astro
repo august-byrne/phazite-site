@@ -1,53 +1,63 @@
 ---
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// The home page: what Phazite is and how to get it (the hero, src/components/Hero.astro), what it does, who it suits,
-// what it promises, and how to take part.
+// The home page: what Phazite is for and how to get it (the hero, src/components/Hero.astro), then a chapter for each
+// of its main parts, whose picture stays in view while the page scrolls through what the part does (Story.astro,
+// DeviceStrip.astro, src/scripts/home.ts), the rest of what it does in short, and how to get it again.
+// The pictures (src/pictures) are painted by Phazite's tests (README.md says how), each in the app's dark theme and in
+// its light one, as the site's theme is. Each step's view is a place in its picture, so look at the page after the
+// pictures are painted anew, and commit both together.
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import DeviceStrip from '../components/DeviceStrip.astro';
 import LucideIcon from '../components/LucideIcon.astro';
-import { repository, withBase } from '../lib/site';
+import Story from '../components/Story.astro';
+import mixerLight from '../pictures/mixer-light.png';
+import mixer from '../pictures/mixer.png';
+import pianoRollDrumsLight from '../pictures/piano-roll-drums-light.png';
+import pianoRollDrums from '../pictures/piano-roll-drums.png';
+import pianoRollLight from '../pictures/piano-roll-light.png';
+import pianoRoll from '../pictures/piano-roll.png';
+import playlistLight from '../pictures/playlist-light.png';
+import playlist from '../pictures/playlist.png';
+import { getRelease, repository, withBase } from '../lib/site';
 
-const features = [
+const release = getRelease();
+
+const more = [
 	{
-		icon: 'layout-dashboard',
-		title: 'Arrange',
-		text: 'A playlist of tracks, folders and clips, with song sections, a chord lane of 40 progressions, a tempo lane that holds, jumps or ramps, and automation on any knob.',
-	},
-	{
-		icon: 'piano',
-		title: 'Write',
-		text: 'A piano roll with a drum mode, keys and scales, chord stamps and transforms, and audio clips that follow the tempo, change pitch or play backwards.',
-	},
-	{
-		icon: 'keyboard-music',
-		title: 'Sound',
-		text: 'Instruments of its own (Synth, Wavetable, Drum Sampler, Sampler and FM) and thirteen effects, each with presets, beside your VST®3 plug-ins.',
-	},
-	{
-		icon: 'zap',
-		title: 'Plug-ins that crash alone',
-		text: 'Each plug-in plays in a process of its own. One that crashes or hangs says so in its slot, with Reload, and the song plays on.',
+		icon: 'circle',
+		title: 'Record',
+		text: 'MIDI from a keyboard or your computer keys, and audio from an interface, with a count-in and punch-in. Capture keeps what you just played, even if you never pressed record.',
+		href: withBase('guide/recording/'),
 	},
 	{
 		icon: 'git-branch',
-		title: 'Versions of every song',
-		text: 'Commit the song with a message, see what changed track by track, branch to try an idea and merge it back, or hear an earlier commit in place.',
+		title: 'Keep versions',
+		text: 'Save a version of the song whenever it is worth keeping, go back to any of them, and switch between the song and its last version while it plays.',
+		href: withBase('guide/source-control/'),
 	},
 	{
-		icon: 'audio-lines',
-		title: 'Record, mix, finish',
-		text: 'Record MIDI and audio with count-in and punch-in, mix with buses, sends, sidechains and parallel chains, and export the song or its stems.',
+		icon: 'arrow-up-to-line',
+		title: 'Export',
+		text: 'The song or its stems as WAV or FLAC, at the loudness you ask for. DAWproject files take a song to Bitwig Studio, Studio One or Cubase.',
+		href: withBase('guide/exporting/'),
 	},
-];
-
-const promises = [
 	{
-		title: 'Free and open',
-		text: 'Free to use for anything, under the AGPL-3.0-or-later, with every line of its code on GitHub.',
+		icon: 'library',
+		title: 'Find sounds',
+		text: 'A browser that searches your folders as you type and plays a sound before you use it, with 85 free drums, loops and effects to download.',
+		href: withBase('guide/browser/'),
 	},
-	{ title: 'No account', text: 'Nothing to sign up for, and your projects stay on your computer.' },
 	{
-		title: 'Online only when you ask',
-		text: 'It downloads Phazite Sounds or checks for a newer version only when you say so, and sends nothing about you.',
+		icon: 'mouse-pointer-2',
+		title: 'Keep your shortcuts',
+		text: 'Coming from FL Studio or Ableton Live? Pick their shortcuts the first time Phazite opens. Ctrl+K finds any command by name.',
+		href: withBase('guide/keyboard/'),
+	},
+	{
+		icon: 'play',
+		title: 'Learn in the app',
+		text: 'Three finished songs to play and take apart, and lessons that walk you through a first beat, recording, arranging, effects and chords.',
+		href: withBase('guide/getting-started/'),
 	},
 ];
 ---
@@ -56,155 +66,299 @@ const promises = [
 	frontmatter={{
 		title: 'A free, open-source DAW',
 		description:
-			'Phazite is a free, open-source DAW for making beats and finishing songs, for Windows: uncluttered and quick, with its own instruments and effects, your VST3 plug-ins, and versions of every song.',
+			'Phazite is a free, open-source DAW for Windows: a playlist, a piano roll, a mixer, five instruments and fifteen effects of its own, and your VST3 plug-ins.',
 		template: 'splash',
-		hero: { title: 'Phazite', tagline: 'A free, open-source DAW for making beats and finishing songs.' },
+		hero: {
+			title: 'From first beat to finished song.',
+			tagline:
+				'Phazite is a free, open-source DAW for Windows. Arrange, write, record and mix in one window, with its own instruments and effects and your VST®3 plug-ins.',
+		},
 		editUrl: false,
 	}}
 >
 	<div class="home not-content">
-		<section aria-labelledby="what">
-			<h2 id="what" class="visually-hidden">What it does</h2>
-			<ul class="features">
+		<Story
+			id="playlist"
+			name="Playlist"
+			title="The whole song on one screen."
+			tint="#d55e00"
+			images={[
 				{
-					features.map((feature) => (
-						<li class="pz-card">
-							<LucideIcon name={feature.icon} class="feature-icon" />
-							<h3>{feature.title}</h3>
-							<p>{feature.text}</p>
+					src: playlist,
+					light: playlistLight,
+					alt: "Phazite's playlist with the House Groove example song: nine tracks of clips under the song's sections and its chord lane, with automation lanes for a filter's cutoff and a track's volume",
+				},
+			]}
+			steps={[
+				{
+					title: 'Arrange',
+					text: 'Tracks, folders and clips on one timeline. Drag a sound in from the browser, then cut, copy and move clips with one tool.',
+					view: [0, 0, 1],
+				},
+				{
+					title: 'Sections and chords',
+					text: 'Name the parts of the song above the bar numbers. A chord lane under them shows the progression, with 40 to start from.',
+					view: [0.035, 0.105, 0.56],
+				},
+				{
+					title: 'Automation',
+					text: 'Any knob can move over the song. Its lane sits under its track, where you draw the curve.',
+					view: [0.035, 0.4, 0.56],
+				},
+			]}
+			guide={{ href: withBase('guide/playlist/'), label: 'The playlist in the guide' }}
+		>
+			<span class="playhead" aria-hidden="true"></span>
+		</Story>
+
+		<Story
+			id="piano-roll"
+			name="Piano roll"
+			title="Write parts that fit the song."
+			tint="#e69f00"
+			images={[
+				{
+					src: pianoRoll,
+					light: pianoRollLight,
+					alt: "Phazite's piano roll with the chords of the Lo-fi Beat example song: notes with their names, the rows of the song's key tinted, the other tracks' notes faint behind them, and the velocity lane under them",
+				},
+				{
+					src: pianoRollDrums,
+					light: pianoRollDrumsLight,
+					alt: "Phazite's piano roll in drum mode: a row for each drum of the kit, named Kick, Snare, Clap and so on, with a hit for each note",
+				},
+			]}
+			steps={[
+				{
+					title: 'Notes',
+					text: 'Click to add a note, drag to move or stretch it. The other tracks show faintly behind, so you can see what you are writing against.',
+					view: [0, 0, 1],
+				},
+				{
+					title: 'Keys and chords',
+					text: "Choose a key and its rows are tinted, along with the notes of the song's current chord. A chord stamp adds a whole chord in one click.",
+					view: [0.035, 0.1, 0.56],
+				},
+				{
+					title: 'Drum mode',
+					text: 'On a drum track the rows are the drums of the kit, by name, and every note is a hit.',
+					view: [0, 0, 1],
+					image: 1,
+				},
+			]}
+			guide={{ href: withBase('guide/piano-roll/'), label: 'The piano roll in the guide' }}
+		/>
+
+		<Story
+			id="mixer"
+			name="Mixer"
+			title="See where the sound goes."
+			tint="#56b4e9"
+			images={[
+				{
+					src: mixer,
+					light: mixerLight,
+					alt: "Phazite's mixer while the House Groove example song plays: a strip for each track with its instrument, effects, sends, pan, fader and meter, and the master with its loudness meter",
+				},
+			]}
+			steps={[
+				{
+					title: 'Strips',
+					text: 'A strip for every track, read from the top the way the sound runs: instrument, effects, sends, pan and fader.',
+					view: [0, 0, 1],
+				},
+				{
+					title: 'Buses, sends and sidechains',
+					text: 'A folder can be a bus for its tracks. Sends share a reverb or a delay, and Duck Under puts the bass under the kick in one step.',
+					view: [0.03, 0.12, 0.6],
+				},
+				{
+					title: 'Loudness',
+					text: 'The master shows loudness in LUFS and the true peak, so you know what the export will measure before you make it.',
+					view: [0.62, 0.555, 0.38],
+				},
+			]}
+			guide={{ href: withBase('guide/mixer/'), label: 'The mixer in the guide' }}
+		/>
+
+		<DeviceStrip />
+
+		<section class="more" aria-labelledby="more-title">
+			<h2 id="more-title" data-arrives>Everything else it does.</h2>
+			<ul>
+				{
+					more.map((item) => (
+						<li data-arrives>
+							<LucideIcon name={item.icon} class="more-icon" />
+							<h3>
+								<a href={item.href}>{item.title}</a>
+							</h3>
+							<p>{item.text}</p>
 						</li>
 					))
 				}
 			</ul>
 		</section>
 
-		<section class="band pz-card" aria-labelledby="coming-from">
-			<div>
-				<h2 id="coming-from">Coming from FL Studio or Ableton Live?</h2>
-				<p>
-					Phazite keeps the playlist, the piano roll and the mixer, with each track one row, one chain of devices and one
-					mixer channel. Choose their shortcuts as Phazite first opens. DAWproject, the open format Bitwig Studio, Studio
-					One and Cubase share, takes your songs out with your plug-ins' settings, and brings them in.
-				</p>
+		<section class="get" aria-labelledby="get-title" data-arrives>
+			<h2 id="get-title">Free and open source.</h2>
+			<p>
+				Phazite costs nothing, for any use, and its code is on GitHub under the AGPL-3.0. It is pre-alpha: there are
+				rough edges, and projects saved now may not open in later versions.
+			</p>
+			<div class="actions">
+				<a class="pz-button primary" href={withBase('download/')}>
+					<LucideIcon name="download" />
+					{release ? 'Download for Windows' : 'Get Phazite'}
+				</a>
+				<a class="pz-button" href={withBase('guide/getting-started/')}>Read the guide</a>
 			</div>
-			<a class="pz-button" href={withBase('guide/getting-started/')}>Getting started</a>
-		</section>
-
-		<section aria-labelledby="promises">
-			<h2 id="promises">Yours, and private</h2>
-			<ul class="promises">
-				{
-					promises.map((promise) => (
-						<li>
-							<h3>{promise.title}</h3>
-							<p>{promise.text}</p>
-						</li>
-					))
-				}
-			</ul>
-		</section>
-
-		<section class="band pz-card" aria-labelledby="involved">
-			<div>
-				<h2 id="involved">Built in the open</h2>
-				<p>
-					Phazite is pre-alpha, and every kind of help counts: try it and <a href={`${repository}/issues`}>say what
-					tripped you up</a>, <a href={`${repository}/blob/main/CONTRIBUTING.md`}>help write it</a>, or see where it is
-					going on <a href="https://github.com/users/august-byrne/projects/1">the project board</a>.
-				</p>
-			</div>
-			<a class="pz-button" href={repository}>Phazite on GitHub</a>
+			<p class="help">
+				Found a bug, or missing something? <a href={`${repository}/issues`}>Open an issue</a>, see{' '}
+				<a href="https://github.com/users/august-byrne/projects/1">what is planned</a>, or{' '}
+				<a href={`${repository}/blob/main/CONTRIBUTING.md`}>help build it</a>.
+			</p>
 		</section>
 	</div>
 </StarlightPage>
+
+<script>
+	import '../scripts/home';
+</script>
 
 <style>
 	.home {
 		display: flex;
 		flex-direction: column;
-		gap: 3rem;
-		margin-top: 3rem;
 	}
 
-	.visually-hidden {
+	/* The playlist's playhead, over its picture, which the page's scroll moves along the song. */
+	.playhead {
 		position: absolute;
-		width: 1px;
-		height: 1px;
-		overflow: hidden;
-		clip-path: inset(50%);
-		white-space: nowrap;
+		top: 20.3%;
+		bottom: 4.2%;
+		left: calc(19.72% + var(--p) * 38%);
+		width: 0.16%;
+		background: var(--pz-focus); /* the app's own, as its picture's */
 	}
 
-	ul {
-		margin: 0;
-		padding: 0;
-		list-style: none;
+	.playhead::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 50%;
+		width: 700%;
+		aspect-ratio: 1;
+		background: inherit;
+		clip-path: polygon(0 0, 100% 0, 100% 45%, 50% 100%, 0 45%);
+		transform: translateX(-50%);
 	}
 
 	h2 {
 		margin: 0;
 		color: var(--pz-text-bright);
-		font-size: var(--sl-text-2xl);
-		font-weight: 600;
-		line-height: 1.3;
+		font-size: clamp(1.75rem, 4.4vw, 3rem);
+		font-weight: 700;
+		letter-spacing: -0.025em;
+		line-height: 1.1;
+		text-align: center;
+		text-wrap: balance;
 	}
 
-	h3 {
-		margin: 0;
-		color: var(--pz-text-bright);
+	.more {
+		margin-top: 8rem;
+	}
+
+	.more ul {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+		gap: 2.5rem 2rem;
+		margin: 3rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.more :global(.more-icon) {
+		width: 1.5rem;
+		height: 1.5rem;
+		color: var(--sl-color-text-accent);
+	}
+
+	.more h3 {
+		margin: 0.75rem 0 0;
 		font-size: var(--sl-text-lg);
 		font-weight: 600;
 		line-height: 1.3;
 	}
 
-	p {
-		margin: 0.5rem 0 0;
-		line-height: 1.6;
+	.more h3 a {
+		color: var(--pz-text-bright);
+		text-decoration: none;
 	}
 
-	a:not(.pz-button) {
+	.more h3 a:hover {
+		text-decoration: underline;
+	}
+
+	.more p {
+		margin: 0.375rem 0 0;
+		color: var(--pz-text);
+		line-height: 1.6;
+		text-wrap: pretty;
+	}
+
+	.get {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		margin-top: 8rem;
+		padding: clamp(2.5rem, 7vw, 5rem) 1.5rem;
+		border: 1px solid var(--pz-border);
+		border-radius: 1rem;
+		background:
+			radial-gradient(ellipse 70% 90% at 50% 0%, var(--pz-glow), transparent),
+			var(--pz-surface);
+		text-align: center;
+	}
+
+	.get p {
+		max-width: 38rem;
+		margin: 1rem 0 0;
+		color: var(--pz-text);
+		font-size: var(--sl-text-lg);
+		line-height: 1.55;
+		text-wrap: pretty;
+	}
+
+	.get .actions {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 0.75rem;
+		margin-top: 2rem;
+	}
+
+	.get .help {
+		margin-top: 1.5rem;
+		color: var(--pz-text-muted);
+		font-size: var(--sl-text-sm);
+	}
+
+	.get .help a {
 		color: var(--sl-color-text-accent);
 	}
 
-	.features {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
-		gap: 1rem;
+	/* With the script, and motion welcome: what comes into view fades up, once. */
+	:global(.pz-motion) [data-arrives] {
+		opacity: 0;
+		transform: translateY(1.5rem);
+		transition:
+			opacity 0.6s ease,
+			transform 0.6s ease;
 	}
 
-	.features li {
-		padding: 1.25rem;
-	}
-
-	.features :global(.feature-icon) {
-		width: 1.75rem;
-		height: 1.75rem;
-		margin-bottom: 0.75rem;
-		color: var(--pz-focus);
-	}
-
-	.band {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 1.25rem 2rem;
-		align-items: center;
-		justify-content: space-between;
-		padding: 1.5rem;
-	}
-
-	.band > div {
-		flex: 1 1 28rem;
-	}
-
-	.promises {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-		gap: 1rem 2rem;
-		margin-top: 1rem;
-	}
-
-	.promises li {
-		padding-inline-start: 1rem;
-		border-inline-start: 2px solid var(--pz-accent);
+	:global(.pz-motion) [data-arrives]:global(.pz-arrived) {
+		opacity: 1;
+		transform: none;
 	}
 </style>

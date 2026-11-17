@@ -187,3 +187,9 @@
 	border-color: var(--pz-warning);
 	color: var(--pz-warning);
 }
+
+/* A picture of the app comes in each of its themes (pz-dark, pz-light), and the site's theme shows its own. */
+:root:not([data-theme='light']) .pz-light,
+:root[data-theme='light'] .pz-dark {
+	display: none !important;
+}

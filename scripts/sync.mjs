@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Brings in what the site shows from the Phazite repository, which stays the one source of it: the user guide
-// (docs/guide), the window's picture and the share card (docs/images), the logo, the notices of what Phazite is built
-// with (resources/licenses/notices.json) and the Lucide icons the app uses. Then it reads the update file of Phazite's
-// latest release, the one Phazite's own update check reads, for the Download page.
+// (docs/guide), the share card (docs/images), the logo, the notices of what Phazite is built with
+// (resources/licenses/notices.json) and the Lucide icons the app uses. Then it reads the update file of Phazite's latest
+// release, the one Phazite's own update check reads, for the Download page. (The home page's pictures of the app are
+// this repository's own, src/pictures: README.md.)
 // PHAZITE_DIR names the repository's folder: ../Phazite, beside this one, unless it says otherwise.
 
 import { existsSync } from 'node:fs';
@@ -16,7 +17,6 @@ const releases = 'https://github.com/august-byrne/Phazite/releases';
 
 const copies = [
 	['docs/guide', 'src/content/docs/guide'],
-	['docs/images/phazite.png', 'src/generated/phazite.png'],
 	['resources/logo/phazite.svg', 'src/generated/logo.svg'],
 	['resources/licenses/notices.json', 'src/generated/notices.json'],
 	['resources/icons/lucide', 'src/generated/lucide'],
@@ -43,7 +43,7 @@ await writeFile(
 	JSON.stringify({ release }, null, '\t') + '\n'
 );
 console.log(
-	`sync: copied the guide, pictures, logo, notices and icons from ${phazite}; ` +
+	`sync: copied the guide, share card, logo, notices and icons from ${phazite}; ` +
 		(release ? `the latest release is ${release.version}.` : 'there is no release yet.')
 );
 

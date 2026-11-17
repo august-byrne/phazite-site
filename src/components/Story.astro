@@ -1,0 +1,304 @@
+---
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// A chapter of the home page about one part of Phazite: its picture stays in view while the page scrolls through the
+// chapter's steps, and moves to the place each step is about (src/scripts/home.ts). A step's view is the part of the
+// picture it shows: its left and top edges and its width, each as a part of the whole picture (0 to 1), with the frame's
+// shape. A step may show another of the chapter's pictures (image), which fades in. What is put inside the component
+// lies over the picture and moves with it. The tint is a colour of the part's picture, which glows faintly behind it.
+// Each picture comes in the app's dark theme and in its light one, and the site's theme chooses.
+// Without scripts, or for a visitor who asked for less motion, the chapter is as tall as it looks: the whole picture,
+// with its steps under it.
+import type { ImageMetadata } from 'astro';
+import { Picture } from 'astro:assets';
+
+interface Props {
+	id: string;
+	name: string; // the part: "Playlist"
+	title: string;
+	tint: string;
+	images: { src: ImageMetadata; light: ImageMetadata; alt: string }[];
+	steps: { title: string; text: string; view: [number, number, number]; image?: number }[];
+	guide: { href: string; label: string };
+}
+
+const { id, name, title, tint, images, steps, guide } = Astro.props;
+const [first] = images;
+---
+
+<section
+	class="story"
+	id={id}
+	aria-labelledby={`${id}-title`}
+	data-story
+	style={`--steps: ${steps.length}; --shape: ${first.src.width} / ${first.src.height}; --tall: ${first.src.height / first.src.width}; --tint: ${tint}`}
+>
+	<div class="stage">
+		<header class="head">
+			<p class="name">{name}</p>
+			<h2 id={`${id}-title`}>{title}</h2>
+		</header>
+		<div class="frame" data-frame>
+			<div class="film" data-film>
+				{
+					images.map((image, index) => (
+						<div class="shot" data-shot={index} data-shown={index === 0 ? '' : undefined}>
+							{[
+								{ theme: 'dark', src: image.src },
+								{ theme: 'light', src: image.light },
+							].map((face) => (
+								<Picture
+									class={`pz-face pz-${face.theme}`}
+									src={face.src}
+									formats={['avif', 'webp']}
+									fallbackFormat="webp"
+									widths={[960, 1440, 1920, 2880, face.src.width]}
+									sizes="(min-width: 84rem) 160rem, 200vw"
+									alt={image.alt}
+									loading="lazy"
+									decoding="async"
+								/>
+							))}
+						</div>
+					))
+				}
+				<slot />
+			</div>
+		</div>
+		<ol class="steps">
+			{
+				steps.map((step, index) => (
+					<li
+						class="step"
+						data-step
+						data-view={step.view.join(' ')}
+						data-image={step.image ?? 0}
+						data-current={index === 0 ? '' : undefined}
+					>
+						<h3>{step.title}</h3>
+						<p>{step.text}</p>
+					</li>
+				))
+			}
+		</ol>
+		<a class="guide" href={guide.href}>{guide.label}</a>
+	</div>
+</section>
+
+<style>
+	.story {
+		--p: 0; /* how far the page is through the chapter, 0 to 1 */
+		--enter: 1; /* how far the chapter has come into view, 0 to 1 */
+		position: relative;
+		margin-top: 6rem;
+	}
+
+	/* As wide as the window lets it be, wider than the page's text. */
+	.stage {
+		position: relative;
+		isolation: isolate;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		justify-items: center;
+		gap: 1rem;
+		width: min(100vw - 2rem, 84rem);
+		margin-inline: calc(50% - min(50vw - 1rem, 42rem));
+	}
+
+	/* The part's colour behind its picture, which comes up as the chapter comes into view and drifts as the page
+	   scrolls through it. */
+	.stage::before {
+		content: '';
+		position: absolute;
+		z-index: -1;
+		inset: 8% 12% 18%;
+		background: radial-gradient(closest-side, color-mix(in srgb, var(--tint) 20%, transparent), transparent);
+		opacity: var(--enter);
+		transform: translateX(calc((var(--p) - 0.5) * 24%));
+		pointer-events: none;
+	}
+
+	.head {
+		text-align: center;
+	}
+
+	.name {
+		margin: 0;
+		color: var(--sl-color-text-accent);
+		font-size: var(--sl-text-sm);
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	h2 {
+		margin: 0.5rem 0 0;
+		color: var(--pz-text-bright);
+		font-size: clamp(1.75rem, 4.4vw, 3rem);
+		font-weight: 700;
+		letter-spacing: -0.025em;
+		line-height: 1.1;
+		text-wrap: balance;
+	}
+
+	.frame {
+		position: relative;
+		width: 100%;
+		aspect-ratio: var(--shape);
+		overflow: hidden;
+		border: 1px solid var(--pz-control-border);
+		border-radius: 0.75rem;
+		background: var(--pz-background); /* the app's own, under its picture */
+		box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 0.35);
+	}
+
+	:global([data-theme='light']) .frame {
+		box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 0.12);
+	}
+
+	.film {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	.shot {
+		position: absolute;
+		inset: 0;
+		opacity: 0;
+		transition: opacity 0.35s ease;
+	}
+
+	.shot[data-shown] {
+		opacity: 1;
+	}
+
+	.shot :global(.pz-face) {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	.steps {
+		display: grid;
+		grid-template-columns: repeat(var(--steps), minmax(0, 1fr));
+		gap: 1.5rem;
+		width: min(100%, 68rem);
+		margin: 0.25rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.step {
+		--fill: 0; /* how far the page is through this step, 0 to 1 */
+		position: relative;
+		padding-top: 0.875rem;
+		border-top: 2px solid var(--pz-border);
+	}
+
+	.step h3 {
+		margin: 0;
+		color: var(--pz-text-bright);
+		font-size: var(--sl-text-lg);
+		font-weight: 600;
+		line-height: 1.3;
+	}
+
+	.step p {
+		margin: 0.375rem 0 0;
+		color: var(--pz-text);
+		font-size: var(--sl-text-base);
+		line-height: 1.55;
+		text-wrap: pretty;
+	}
+
+	.guide {
+		color: var(--sl-color-text-accent);
+		font-size: var(--sl-text-sm);
+		font-weight: 600;
+		text-decoration: none;
+	}
+
+	.guide::after {
+		content: ' \2192';
+	}
+
+	.guide:hover {
+		text-decoration: underline;
+	}
+
+	@media (width < 50em) {
+		.steps {
+			grid-template-columns: minmax(0, 1fr);
+			gap: 1rem;
+		}
+	}
+
+	/* With the script, and motion welcome: the chapter is a screen tall for each step, and its stage stays in view
+	   under the header while the page scrolls through it. */
+	:global(.pz-motion) .story {
+		height: calc(var(--steps) * 90vh + 100vh);
+		margin-top: 0;
+	}
+
+	:global(.pz-motion) .stage {
+		position: sticky;
+		top: var(--sl-nav-height);
+		height: calc(100vh - var(--sl-nav-height));
+		height: calc(100svh - var(--sl-nav-height));
+		align-content: center;
+		padding-block: 0.75rem;
+	}
+
+	/* The frame as large as leaves room for the heading over it and the steps under it. */
+	:global(.pz-motion) .frame {
+		width: min(100%, (100svh - var(--sl-nav-height) - 18rem) / var(--tall));
+		opacity: calc(var(--enter) * 1.6);
+		transform: translateY(calc((1 - var(--enter)) * 5rem)) scale(calc(0.92 + var(--enter) * 0.08));
+	}
+
+	:global(.pz-motion) .step {
+		opacity: 0.45;
+		cursor: pointer;
+		transition: opacity 0.3s ease;
+	}
+
+	:global(.pz-motion) .step[data-current] {
+		opacity: 1;
+	}
+
+	:global(.pz-motion) .step::before {
+		content: '';
+		position: absolute;
+		top: -2px;
+		left: 0;
+		width: 100%;
+		height: 2px;
+		background: var(--pz-focus);
+		transform: scaleX(var(--fill));
+		transform-origin: 0 50%;
+	}
+
+	/* On a narrow screen, one step at a time, each in the same place. */
+	@media (width < 50em) {
+		:global(.pz-motion) .steps {
+			min-height: 9.5rem;
+		}
+
+		:global(.pz-motion) .step {
+			grid-area: 1 / 1;
+			opacity: 0;
+			pointer-events: none;
+		}
+
+		:global(.pz-motion) .step[data-current] {
+			opacity: 1;
+		}
+
+		:global(.pz-motion) .frame {
+			width: min(100%, (100svh - var(--sl-nav-height) - 23rem) / var(--tall));
+		}
+	}
+</style>

@@ -1,10 +1,11 @@
 ---
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// The home page's top, in place of Starlight's hero: the logo, the name and what Phazite is, the way to get it, and the
-// window's picture under them, as wide as the page.
+// The home page's top, in place of Starlight's hero: what Phazite is for, the way to get it, and the window's picture,
+// which lies back at first and stands up as the page scrolls (src/scripts/home.ts), over lines like the playlist's bars.
+// The picture is in the site's theme; the dark one, which the site opens with, is fetched first.
 import { Picture } from 'astro:assets';
-import logo from '../generated/logo.svg?raw';
-import screenshot from '../generated/phazite.png';
+import light from '../pictures/window-light.png';
+import dark from '../pictures/window.png';
 import { getRelease, repository, withBase } from '../lib/site';
 import LucideIcon from './LucideIcon.astro';
 
@@ -12,93 +13,108 @@ const { hero } = Astro.locals.starlightRoute.entry.data;
 const release = getRelease();
 ---
 
-<div class="hero not-content">
+<!-- Before the page is drawn: whether it moves (src/scripts/home.ts), so that it is laid out once. -->
+<script is:inline>
+	if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('pz-motion');
+</script>
+
+<div class="hero not-content" data-hero>
+	<div class="bars" aria-hidden="true"></div>
 	<div class="intro">
-		<span class="mark" aria-hidden="true" set:html={logo} />
+		<a class="pz-chip" href={withBase('guide/faq/#what-does-pre-alpha-mean')}>Pre-alpha</a>
 		<h1 id="_top">{hero?.title}</h1>
 		<p class="tagline">{hero?.tagline}</p>
-		<p class="summary">
-			Uncluttered and quick, light on your computer, with instruments and effects of its own, your plug-ins, and versions
-			of every song.
-		</p>
 		<div class="actions">
 			<a class="pz-button primary" href={withBase('download/')}>
 				<LucideIcon name="download" />
 				{release ? 'Download for Windows' : 'Get Phazite'}
 			</a>
-			<a class="pz-button" href={repository}>View the code on GitHub</a>
+			<a class="pz-button" href={repository}>Source on GitHub</a>
 		</div>
 		<p class="status">
-			<a class="pz-chip" href={withBase('guide/faq/#what-does-pre-alpha-mean')}>Pre-alpha</a>
-			<span>
-				{release ? `Version ${release.version} for Windows 11 x64` : 'Windows 11 x64 · no release yet: build it yourself'}
-			</span>
+			{
+				release
+					? `Version ${release.version} · Windows 11 x64 · free`
+					: 'Windows 11 x64 · free · no release yet, so you build it from source'
+			}
 		</p>
 	</div>
-	<Picture
-		class="shot"
-		src={screenshot}
-		formats={['avif', 'webp']}
-		fallbackFormat="webp"
-		widths={[720, 1080, 1440, 2160]}
-		sizes="(min-width: 72rem) 67.5rem, calc(100vw - 2rem)"
-		alt="Phazite with the House Groove example song: the browser on the left with Phazite's instruments, the whole song in the playlist with its sections, chord lane, a filter's automation and the playhead in the second drop, and the synth of the Chords track under it"
-		loading="eager"
-		fetchpriority="high"
-	/>
+	<div class="shot-frame" data-hero-shot>
+		{
+			[
+				{ theme: 'dark', src: dark },
+				{ theme: 'light', src: light },
+			].map((face) => (
+				<Picture
+					class={`shot pz-${face.theme}`}
+					src={face.src}
+					formats={['avif', 'webp']}
+					fallbackFormat="webp"
+					widths={[720, 1080, 1440, 2160, 2560]}
+					sizes="(min-width: 84rem) 80rem, calc(100vw - 2rem)"
+					alt="Phazite with the House Groove example song: the browser on the left with Phazite's instruments, the whole song in the playlist with its sections, chord lane, a filter's automation and the playhead in the second drop, and the synth of the Chords track under it"
+					loading={face.theme === 'dark' ? 'eager' : 'lazy'}
+					fetchpriority={face.theme === 'dark' ? 'high' : 'auto'}
+				/>
+			))
+		}
+	</div>
 </div>
 
 <style>
 	.hero {
+		--hero-p: 1; /* how far the picture has stood up, 0 to 1: the script moves it; without it, it stands */
+		position: relative;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 2.5rem;
-		padding-block: 2rem 1rem;
+		gap: 2rem;
+		padding-block: clamp(1.5rem, 5vh, 4rem) 2rem;
 		text-align: center;
+	}
+
+	/* Where the page moves, the picture starts lying back. */
+	:global(.pz-motion) .hero {
+		--hero-p: 0.25;
+	}
+
+	/* Bar lines, as the playlist's, fading out around the words, which drift as the page scrolls. */
+	.bars {
+		position: absolute;
+		z-index: -1;
+		inset: -6rem calc(50% - 50vw + 0.5rem) 30%;
+		background-image:
+			repeating-linear-gradient(90deg, var(--pz-border) 0 1px, transparent 1px 7rem),
+			repeating-linear-gradient(90deg, color-mix(in srgb, var(--pz-border) 45%, transparent) 0 1px, transparent 1px 1.75rem);
+		background-position-x: calc(var(--hero-p) * -3.5rem);
+		mask-image: radial-gradient(ellipse 60% 75% at 50% 45%, transparent 25%, #000 100%);
+		opacity: 0.7;
 	}
 
 	.intro {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		max-width: 40rem;
-	}
-
-	.mark {
-		display: block;
-		width: 4rem;
-		height: 4rem;
-		margin-bottom: 1rem;
-	}
-
-	.mark :global(svg) {
-		width: 100%;
-		height: 100%;
+		max-width: 52rem;
 	}
 
 	h1 {
-		margin: 0;
+		margin: 1.25rem 0 0;
 		color: var(--pz-text-bright);
-		font-size: clamp(2.5rem, 6vw, 3.5rem);
+		font-size: clamp(2.5rem, 7.2vw, 5rem);
 		font-weight: 700;
-		letter-spacing: -0.02em;
-		line-height: 1.1;
+		letter-spacing: -0.035em;
+		line-height: 1.02;
+		text-wrap: balance;
 	}
 
 	.tagline {
-		margin: 0.75rem 0 0;
-		color: var(--pz-text-bright);
-		font-size: clamp(1.25rem, 3vw, 1.5rem);
-		font-weight: 500;
-		line-height: 1.35;
-	}
-
-	.summary {
-		margin: 0.75rem 0 0;
-		color: var(--pz-text-muted);
-		font-size: var(--sl-text-lg);
-		line-height: 1.6;
+		max-width: 40rem;
+		margin: 1.5rem 0 0;
+		color: var(--pz-text);
+		font-size: clamp(1.0625rem, 2.2vw, 1.3125rem);
+		line-height: 1.5;
+		text-wrap: pretty;
 	}
 
 	.actions {
@@ -106,26 +122,30 @@ const release = getRelease();
 		flex-wrap: wrap;
 		justify-content: center;
 		gap: 0.75rem;
-		margin-top: 1.75rem;
+		margin-top: 2rem;
 	}
 
 	.status {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		align-items: center;
-		gap: 0.5rem 0.75rem;
-		margin: 1.25rem 0 0;
+		margin: 1rem 0 0;
 		color: var(--pz-text-muted);
 		font-size: var(--sl-text-sm);
+	}
+
+	/* The picture, as wide as the window lets it be, wider than the page's text. */
+	.shot-frame {
+		width: min(100vw - 2rem, 80rem);
+		perspective: 100rem;
 	}
 
 	.hero :global(.shot) {
 		display: block;
 		width: 100%;
 		height: auto;
-		border: 1px solid var(--pz-border);
-		border-radius: var(--pz-radius);
-		box-shadow: 0 1.5rem 5rem var(--pz-glow);
+		border: 1px solid var(--pz-control-border);
+		border-radius: 0.75rem;
+		box-shadow: 0 2rem 6rem calc(var(--hero-p) * 1rem) var(--pz-glow);
+		transform-origin: 50% 100%;
+		transform: rotateX(calc((1 - var(--hero-p)) * 24deg)) scale(calc(0.86 + var(--hero-p) * 0.14));
+		will-change: transform;
 	}
 </style>
